@@ -14,8 +14,11 @@
 
 PROTOBUF_DIR=third-party/google/protobuf/protobuf-3.3.0/
 PROTOBUF_HDRS=third-party/google/protobuf/include/
-PROTOBUF_LIBS=third-party/google/protobuf/lib:/usr/local/opt/openssl/lib
+PROTOBUF_LIBS=third-party/google/protobuf/lib
 PROTOC=third-party/google/protobuf/bin/protoc
+OPENSSL_DIR=/usr/local/opt/openssl
+OPENSSL_HDRS=${OPENSSL_DIR}/include
+OPENSSL_LIBS=${OPENSSL_DIR}/lib
 GTEST_DIR=third-party/google/gtest/gtest-1.7.0
 GTEST_HDRS=third-party/google/gtest/gtest-1.7.0/include
 GTEST_LIBS=third-party/google/gtest/
@@ -28,7 +31,7 @@ TEST_STDERR=test_stderr.log
 
 # TODO: remove the debug and optimization flags when ready for deployment
 #CFLAGS=-std=gnu++0x -Wall -Wnarrowing -Wextra -Werror -pthread -fPIC -g -O0 -I include -I .
-CFLAGS=-std=gnu++0x -Wall -Wnarrowing -Wextra -pthread -fPIC -g -O0 -I include -I . -I/usr/local/opt/openssl/include
+CFLAGS=-std=gnu++0x -Wall -Wnarrowing -Wextra -pthread -fPIC -g -O0 -I include -I . -I${OPENSSL_HDRS}
 
 INC_PATH = include/securemessage
 
@@ -57,7 +60,7 @@ PROJ_OPENSSL_OBJECT_FILES = \
 #################################
 # Library -- we can build securemessage with a variety of backends
 libsecuremessage-openssl.so: ${PROJ_OPENSSL_OBJECT_FILES}
-	${CC} -o $@ -shared $^ -L/usr/local/opt/openssl/lib -Lthird-party/google/protobuf/lib -lcrypto -lprotobuf-lite -lprotoc
+	${CC} -o $@ -shared $^ -L${OPENSSL_LIBS} -L${PROTOBUF_LIBS} -lcrypto -lprotobuf-lite -lprotoc
 
 
 #################################
@@ -65,16 +68,16 @@ libsecuremessage-openssl.so: ${PROJ_OPENSSL_OBJECT_FILES}
 run_tests: run_parser_tests run_proto_util_tests run_openssl_test
 
 run_parser_tests: secure_message_parser_openssl_test
-	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${LD_LIBRARY_PATH}; ./secure_message_parser_openssl_test 2> ${TEST_STDERR}
+	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${OPENSSL_LIBS}:${LD_LIBRARY_PATH}; ./secure_message_parser_openssl_test 2> ${TEST_STDERR}
 
 run_proto_util_tests: public_key_proto_util_openssl_test
-	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${LD_LIBRARY_PATH}; ./public_key_proto_util_openssl_test 2> ${TEST_STDERR}
+	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${OPENSSL_LIBS}:${LD_LIBRARY_PATH}; ./public_key_proto_util_openssl_test 2> ${TEST_STDERR}
 
 run_openssl_test: crypto_ops_openssl_test
-	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${LD_LIBRARY_PATH}; ./crypto_ops_openssl_test 2> ${TEST_STDERR}
+	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${OPENSSL_LIBS}:${LD_LIBRARY_PATH}; ./crypto_ops_openssl_test 2> ${TEST_STDERR}
 
 run_builder_openssl_test: builder_openssl_test
-	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${LD_LIBRARY_PATH}; ./builder_openssl_test 2> ${TEST_STDERR}
+	export LD_LIBRARY_PATH=${PROTOBUF_LIBS}:${OPENSSL_LIBS}:${LD_LIBRARY_PATH}; ./builder_openssl_test 2> ${TEST_STDERR}
 
 
 #################################
@@ -89,7 +92,7 @@ byte_buffer.o: ${SM_SRC}/byte_buffer.cc ${INC_PATH}/byte_buffer.h
 #################################
 # Crypto Operations
 crypto_ops.o: ${SM_SRC}/crypto_ops.cc ${INC_PATH}/crypto_ops.h ${INC_PATH}/byte_buffer.h ${INC_PATH}/common.h ${INC_PATH}/secure_message_wrapper.h
-	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -c $<
+	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -I ${OPENSSL_HDRS} -c $<
 
 crypto_ops_openssl.o: ${SM_SRC}/crypto_ops_openssl.cc ${INC_PATH}/crypto_ops.h ${INC_PATH}/byte_buffer.h ${INC_PATH}/util.h
 	${CC} ${CFLAGS} -c $<
@@ -98,7 +101,7 @@ crypto_ops_test.o: ${SM_TEST}/crypto_ops_test.cc crypto_ops.o
 	${CC} ${CFLAGS} -I ${GTEST_HDRS} -c $<
 
 crypto_ops_openssl_test: crypto_ops_test.o ${PROJ_OPENSSL_OBJECT_FILES} ${GTEST_MAIN}
-	${CC} ${CFLAGS} -I ${GTEST_HDRS} -L ${PROTOBUF_LIBS} -L ${GTEST_LIBS} -o $@ $^ -lgtest -lcrypto -lprotobuf
+	${CC} ${CFLAGS} -I ${GTEST_HDRS} -L ${PROTOBUF_LIBS} -L ${OPENSSL_LIBS} -L ${GTEST_LIBS} -o $@ $^ -lgtest -lcrypto -lprotobuf
 
 
 #################################
@@ -110,7 +113,7 @@ raw_secure_message_parser.o: ${SM_SRC}/raw_secure_message_parser.cc ${INC_PATH}/
 	${CC} ${CFLAGS} -c $<
 
 secure_message_parser_openssl_test: ${SM_TEST}/secure_message_parser_test.cc ${PROJ_OPENSSL_OBJECT_FILES} ${GTEST_MAIN}
-	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -L ${PROTOBUF_LIBS} -I ${GTEST_HDRS} -L ${GTEST_LIBS} -o $@ $^ -lprotobuf -lgtest -lcrypto
+	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -L ${PROTOBUF_LIBS} -L ${OPENSSL_LIBS} -I ${GTEST_HDRS} -L ${GTEST_LIBS} -o $@ $^ -lprotobuf -lgtest -lcrypto
 
 
 #################################
@@ -122,7 +125,7 @@ builder_parser_test.o: ${SM_TEST}/builder_parser_test.cc ${INC_PATH}/secure_mess
 	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -I ${GTEST_HDRS} -c $<
 
 builder_openssl_test: builder_parser_test.o ${PROJ_OPENSSL_OBJECT_FILES} ${GTEST_MAIN}
-	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -L ${PROTOBUF_LIBS} -I ${GTEST_HDRS} -L ${GTEST_LIBS} -o $@ $^ -lprotobuf -lgtest -lcrypto
+	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -L ${PROTOBUF_LIBS} -L ${OPENSSL_LIBS} -I ${GTEST_HDRS} -L ${GTEST_LIBS} -o $@ $^ -lprotobuf -lgtest -lcrypto
 
 
 #################################
@@ -146,7 +149,7 @@ public_key_proto_util.o: ${SM_SRC}/public_key_proto_util.cc ${INC_PATH}/public_k
 	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -c $<
 
 public_key_proto_util_openssl_test: ${SM_TEST}/public_key_proto_util_test.cc ${PROJ_OPENSSL_OBJECT_FILES} ${GTEST_MAIN}
-	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -L ${PROTOBUF_LIBS} -I ${GTEST_HDRS} -L ${GTEST_LIBS} -o $@ $^ -lprotobuf -lgtest -lcrypto
+	${CC} ${CFLAGS} -I ${PROTOBUF_HDRS} -L ${PROTOBUF_LIBS} -L ${OPENSSL_LIBS} -I ${GTEST_HDRS} -L ${GTEST_LIBS} -o $@ $^ -lprotobuf -lgtest -lcrypto
 
 
 ##################################
