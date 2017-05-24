@@ -30,7 +30,7 @@ unique_ptr<GenericPublicKey> PublicKeyProtoUtil::EncodePublicKey(
       }
 
       unique_ptr<GenericPublicKey> result(new GenericPublicKey());
-      result->set_type(PublicKeyType::EC_P256);
+      //result->set_type(PublicKeyType::EC_P256);
       result->mutable_ec_p256_public_key()->CopyFrom(*ec_key);
       return result;
     }
@@ -41,7 +41,7 @@ unique_ptr<GenericPublicKey> PublicKeyProtoUtil::EncodePublicKey(
       }
 
       unique_ptr<GenericPublicKey> result(new GenericPublicKey());
-      result->set_type(PublicKeyType::RSA2048);
+      //result->set_type(PublicKeyType::RSA2048);
       result->mutable_rsa2048_public_key()->CopyFrom(*rsa_key);
       return result;
     }
@@ -80,14 +80,14 @@ unique_ptr<SimpleRsaPublicKey> PublicKeyProtoUtil::EncodeRsaPublicKey(
 
 unique_ptr<CryptoOps::PublicKey> PublicKeyProtoUtil::ParsePublicKey(
     const GenericPublicKey& key) {
-  switch (key.type()) {
-    case EC_P256: {
+  switch (key.public_key_case()) {
+    case GenericPublicKey::kEcP256PublicKey: {
       if (!key.has_ec_p256_public_key()) {
         return nullptr;
       }
       return ParseEcPublicKey(key.ec_p256_public_key());
     }
-    case RSA2048: {
+    case GenericPublicKey::kRsa2048PublicKey: {
       if (!key.has_rsa2048_public_key()) {
         return nullptr;
       }

@@ -19,12 +19,12 @@
 syntax = "proto3";
 
 package securemessage;
-option optimize_for = LITE_RUNTIME;
 
 option java_package = "com.google.security.cryptauth.lib.securemessage";
 option java_outer_classname = "SecureMessageProto";
 option java_multiple_files = true;
 
+option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
 option objc_class_prefix = "SECMSG";
@@ -95,13 +95,13 @@ message HeaderAndBodyInternal {
 // -------
 
 // A list of supported public key types
-enum PublicKeyType {
-    UNKNOWN_PUBLIC_KEY_TYPE = 0;
-    EC_P256 = 1;
-    RSA2048 = 2;
+//enum PublicKeyType {
+//    UNKNOWN_PUBLIC_KEY_TYPE = 0;
+//    EC_P256 = 1;
+//    RSA2048 = 2;
     // 2048-bit MODP group 14, from RFC 3526
-    DH2048_MODP = 3;
-}
+//    DH2048_MODP = 3;
+//}
 
 // A convenience proto for encoding NIST P-256 elliptic curve public keys
 message EcP256PublicKey {
@@ -127,11 +127,10 @@ message DhPublicKey {
 }
 
 message GenericPublicKey {
-    PublicKeyType type = 1;
     oneof public_key {
-        EcP256PublicKey ec_p256_public_key = 2;
-        SimpleRsaPublicKey rsa2048_public_key = 3;
+        EcP256PublicKey ec_p256_public_key = 1;
+        SimpleRsaPublicKey rsa2048_public_key = 2;
         // Use only as a last resort
-        DhPublicKey dh2048_public_key = 4;
+        DhPublicKey dh2048_public_key = 3;
     }
 }
