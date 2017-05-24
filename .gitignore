@@ -3,6 +3,7 @@
 
 cpp/*.pb.h
 cpp/*.pb.cc
+cpp/*_test
 
 ### Python template
 # Byte-compiled / optimized / DLL files
