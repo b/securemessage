@@ -12,22 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PROTOBUF_DIR=third-party/google/protobuf/protobuf-2.5.0/
+PROTOBUF_DIR=third-party/google/protobuf/protobuf-3.3.0/
 PROTOBUF_HDRS=third-party/google/protobuf/include/
-PROTOBUF_LIBS=third-party/google/protobuf/lib/
+PROTOBUF_LIBS=third-party/google/protobuf/lib:/usr/local/opt/openssl/lib
 PROTOC=third-party/google/protobuf/bin/protoc
-GTEST_DIR=third-party/google/gtest/gtest-1.7.0/
+GTEST_DIR=third-party/google/gtest/gtest-1.7.0
 GTEST_HDRS=third-party/google/gtest/gtest-1.7.0/include
 GTEST_LIBS=third-party/google/gtest/
 GTEST_MAIN=third-party/google/gtest/gtest-1.7.0/src/gtest_main.cc
-SM_SRC=src/securemessage/
-SM_TEST=test/securemessage/
+SM_SRC=src/securemessage
+SM_TEST=test/securemessage
 CC=g++
 
 TEST_STDERR=test_stderr.log
 
 # TODO: remove the debug and optimization flags when ready for deployment
-CFLAGS=-std=gnu++0x -Wall -Wnarrowing -Wextra -Werror -pthread -fPIC -g -O0 -I include -I .
+#CFLAGS=-std=gnu++0x -Wall -Wnarrowing -Wextra -Werror -pthread -fPIC -g -O0 -I include -I .
+CFLAGS=-std=gnu++0x -Wall -Wnarrowing -Wextra -pthread -fPIC -g -O0 -I include -I . -I/usr/local/opt/openssl/include
 
 INC_PATH = include/securemessage
 
@@ -56,7 +57,7 @@ PROJ_OPENSSL_OBJECT_FILES = \
 #################################
 # Library -- we can build securemessage with a variety of backends
 libsecuremessage-openssl.so: ${PROJ_OPENSSL_OBJECT_FILES}
-	${CC} -o $@ -shared $^ -lcrypto
+	${CC} -o $@ -shared $^ -L/usr/local/opt/openssl/lib -Lthird-party/google/protobuf/lib -lcrypto -lprotobuf-lite -lprotoc
 
 
 #################################
@@ -159,7 +160,8 @@ protobuf:
 	make -C ${PROTOBUF_DIR} install
 
 gtest:
-	${CC} -isystem ${GTEST_DIR}/include -I ${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc
+	cd ${GTEST_DIR}
+	${CC} -isystem ${GTEST_DIR}/include -I ${GTEST_DIR} -I ${GTEST_DIR}/include -pthread -c ${GTEST_DIR}/src/gtest-all.cc
 	ar -rv libgtest.a gtest-all.o
 	mv libgtest.a gtest-all.o ${GTEST_LIBS}
 

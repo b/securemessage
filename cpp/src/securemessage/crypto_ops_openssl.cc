@@ -492,7 +492,7 @@ bool CryptoOps::EcdsaP256Sha256Verify(const PublicKey& public_key,
   // Make sure we don't overflow EVP_VerifyUpdate
   if (data.size() > UINT_MAX) {
     Util::LogError("Data too big to verify");
-    return nullptr;
+    return false;//nullptr;
   }
 
   EvpKeyPtr extracted_public_evpkey = CreateEvpPublicKey(public_key);
@@ -696,13 +696,13 @@ bool CryptoOps::Rsa2048Sha256Verify(const PublicKey& public_key,
                                     const ByteBuffer& data) {
   if (public_key.algorithm() != KeyAlgorithm::RSA_KEY ||
       public_key.data().size() == 0 || data.size() == 0) {
-    return nullptr;
+    return false;//nullptr;
   }
 
   // Make sure we don't overflow EVP_VerifyUpdate
   if (data.size() > UINT_MAX) {
     Util::LogError("Data too big to verify");
-    return nullptr;
+    return false;//nullptr;
   }
 
   int return_code;

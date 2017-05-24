@@ -16,56 +16,64 @@
 
 // Proto definitions for SecureMessage format
 
-syntax = "proto2";
+syntax = "proto3";
 
 package securemessage;
-option java_package = "com.google.security.cryptauth.lib.securemessage";
 option optimize_for = LITE_RUNTIME;
+
+option java_package = "com.google.security.cryptauth.lib.securemessage";
 option java_outer_classname = "SecureMessageProto";
+option java_multiple_files = true;
+
+option cc_enable_arenas = true;
+
+option objc_class_prefix = "SECMSG";
 
 message SecureMessage {
-  // Must contain a HeaderAndBody message
-  required bytes header_and_body = 1;
-  // Signature of header_and_body
-  required bytes signature = 2;
+    // Must contain a HeaderAndBody message
+    bytes header_and_body = 1;
+    // Signature of header_and_body
+    bytes signature = 2;
 }
 
 // Supported "signature" schemes (both symmetric key and public key based)
 enum SigScheme {
-  HMAC_SHA256 = 1;
-  ECDSA_P256_SHA256 = 2;
-  // Not recommended -- use ECDSA_P256_SHA256 instead
-  RSA2048_SHA256 = 3;
+    UNKNOWN_SIGNATURE_SCHEME = 0;
+    HMAC_SHA256 = 1;
+    ECDSA_P256_SHA256 = 2;
+    // Not recommended -- use ECDSA_P256_SHA256 instead
+    RSA2048_SHA256 = 3;
 }
 
 // Supported encryption schemes
 enum EncScheme {
-  // No encryption
-  NONE = 1;
-  AES_256_CBC = 2;
+    UNKNOWN_ENCRYPTION_SCHEME = 0;
+    // No encryption
+    NONE = 1;
+    AES_256_CBC = 2;
 }
 
 message Header {
-  required SigScheme signature_scheme = 1;
-  required EncScheme encryption_scheme = 2;
-  // Identifies the verification key
-  optional bytes verification_key_id = 3;
-  // Identifies the decryption key
-  optional bytes decryption_key_id = 4;
-  // Encryption may use an IV
-  optional bytes iv = 5;
-  // Arbitrary per-protocol public data, to be sent with the plain-text header
-  optional bytes public_metadata = 6;
-  // The length of some associated data this is not sent in this SecureMessage,
-  // but which will be bound to the signature.
-  optional uint32 associated_data_length = 7 [ default = 0 ];
+    SigScheme signature_scheme = 1;
+    EncScheme encryption_scheme = 2;
+    // Identifies the verification key
+    bytes verification_key_id = 3;
+    // Identifies the decryption key
+    bytes decryption_key_id = 4;
+    // Encryption may use an IV
+    bytes iv = 5;
+    // Arbitrary per-protocol public data, to be sent with the plain-text header
+    bytes public_metadata = 6;
+    // The length of some associated data this is not sent in this SecureMessage,
+    // but which will be bound to the signature.
+    uint32 associated_data_length = 7;
 }
 
 message HeaderAndBody {
-  // Public data about this message (to be bound in the signature)
-  required Header header = 1;
-  // Payload data
-  required bytes body = 2;
+    // Public data about this message (to be bound in the signature)
+    Header header = 1;
+    // Payload data
+    bytes body = 2;
 }
 
 // Must be kept wire-format compatible with HeaderAndBody. Provides the
@@ -74,10 +82,10 @@ message HeaderAndBody {
 // low-level representation of a HeaderAndBody should not be used by
 // any code outside of the SecureMessage library implementation/tests.
 message HeaderAndBodyInternal {
-  // A raw (wire-format) byte encoding of a Header, suitable for hashing
-  required bytes header = 1;
-  // Payload data
-  required bytes body = 2;
+    // A raw (wire-format) byte encoding of a Header, suitable for hashing
+    bytes header = 1;
+    // Payload data
+    bytes body = 2;
 }
 
 // -------
@@ -88,39 +96,42 @@ message HeaderAndBodyInternal {
 
 // A list of supported public key types
 enum PublicKeyType {
-  EC_P256 = 1;
-  RSA2048 = 2;
-  // 2048-bit MODP group 14, from RFC 3526
-  DH2048_MODP = 3;
+    UNKNOWN_PUBLIC_KEY_TYPE = 0;
+    EC_P256 = 1;
+    RSA2048 = 2;
+    // 2048-bit MODP group 14, from RFC 3526
+    DH2048_MODP = 3;
 }
 
 // A convenience proto for encoding NIST P-256 elliptic curve public keys
 message EcP256PublicKey {
-  // x and y are encoded in big-endian two's complement (slightly wasteful)
-  // Client MUST verify (x,y) is a valid point on NIST P256
-  required bytes x = 1;
-  required bytes y = 2;
+    // x and y are encoded in big-endian two's complement (slightly wasteful)
+    // Client MUST verify (x,y) is a valid point on NIST P256
+    bytes x = 1;
+    bytes y = 2;
 }
 
 // A convenience proto for encoding RSA public keys with small exponents
 message SimpleRsaPublicKey {
-  // Encoded in big-endian two's complement
-  required bytes n = 1;
-  optional int32 e = 2 [default = 65537];
+    // Encoded in big-endian two's complement
+    bytes n = 1;
+    int32 e = 2; // [default = 65537];
 }
 
 // A convenience proto for encoding Diffie-Hellman public keys,
 // for use only when Elliptic Curve based key exchanges are not possible.
 // (Note that the group parameters must be specified separately)
 message DhPublicKey {
-  // Big-endian two's complement encoded group element
-  required bytes y = 1;
+    // Big-endian two's complement encoded group element
+    bytes y = 1;
 }
 
 message GenericPublicKey {
-  required PublicKeyType type = 1;
-  optional EcP256PublicKey ec_p256_public_key = 2;
-  optional SimpleRsaPublicKey rsa2048_public_key = 3;
-  // Use only as a last resort
-  optional DhPublicKey dh2048_public_key = 4;
+    PublicKeyType type = 1;
+    oneof public_key {
+        EcP256PublicKey ec_p256_public_key = 2;
+        SimpleRsaPublicKey rsa2048_public_key = 3;
+        // Use only as a last resort
+        DhPublicKey dh2048_public_key = 4;
+    }
 }

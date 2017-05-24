@@ -29,7 +29,7 @@ namespace securemessage {
 
 std::unique_ptr<Header> SecureMessageParser::GetUnverifiedHeader(
     const SecureMessage& secmsg) {
-  if (!secmsg.has_header_and_body()) {
+  if (secmsg.header_and_body().empty()) {
     Util::LogError("message must have header and body");
     return nullptr;
   }
@@ -45,11 +45,11 @@ std::unique_ptr<Header> SecureMessageParser::GetUnverifiedHeader(
   }
   std::unique_ptr<Header> header(new Header(header_and_body.header()));
 
-  if (!header->has_signature_scheme()) {
+  if (!header->signature_scheme()) {
     Util::LogError("Header must have a valid signature scheme");
     return nullptr;
   }
-  if (!header->has_encryption_scheme()) {
+  if (!header->encryption_scheme()) {
     Util::LogError("Header must have a valid encryption scheme");
     return nullptr;
   }
@@ -68,11 +68,11 @@ std::unique_ptr<HeaderAndBody> SecureMessageParser::ParseSignedCleartextMessage(
 std::unique_ptr<HeaderAndBody> SecureMessageParser::ParseSignedCleartextMessage(
         const SecureMessage& secmsg, const CryptoOps::Key& verification_key,
         CryptoOps::SigType sig_type, const string& associated_data) {
-  if (!secmsg.has_header_and_body()) {
+  if (secmsg.header_and_body().empty()) {
     Util::LogError("message must have header and body");
     return nullptr;
   }
-  if (!secmsg.has_signature()) {
+  if (secmsg.signature().empty()) {
     Util::LogError("message must have signature");
     return nullptr;
   }
@@ -94,11 +94,11 @@ std::unique_ptr<HeaderAndBody> SecureMessageParser::ParseSignCryptedMessage(
     const SecureMessage& secmsg, const CryptoOps::Key& verification_key,
     CryptoOps::SigType sig_type, const CryptoOps::SecretKey& decryption_key,
     CryptoOps::EncType enc_type, const string& associated_data) {
-  if (!secmsg.has_header_and_body()) {
+  if (secmsg.header_and_body().empty()) {
     Util::LogError("message must have header and body");
     return nullptr;
   }
-  if (!secmsg.has_signature()) {
+  if (secmsg.signature().empty()) {
     Util::LogError("message must have signature");
     return nullptr;
   }

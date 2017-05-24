@@ -25,7 +25,7 @@ std::unique_ptr<string> SecureMessageWrapper::ParseHeaderIv(
     const string& header_and_body_bytes) {
   HeaderAndBody header_and_body;
   header_and_body.ParseFromString(header_and_body_bytes);
-  if (header_and_body.has_header() && header_and_body.header().has_iv()) {
+  if (header_and_body.has_header() && !header_and_body.header().iv().empty()) {
     return std::unique_ptr<string>(new string(
         header_and_body.header().iv()));
   } else {
@@ -49,7 +49,7 @@ std::unique_ptr<string> SecureMessageWrapper::ParseInternalHeader(
     const string& header_and_body_bytes) {
   HeaderAndBodyInternal header_and_body;
   header_and_body.ParseFromString(header_and_body_bytes);
-  if (header_and_body.has_header()) {
+  if (!header_and_body.header().empty()) {
     return std::unique_ptr<string>(
         new string(header_and_body.header()));
   } else {
@@ -61,7 +61,7 @@ std::unique_ptr<string> SecureMessageWrapper::ParseBody(
     const string& header_and_body_bytes) {
   HeaderAndBody header_and_body;
   header_and_body.ParseFromString(header_and_body_bytes);
-  if (header_and_body.has_body()) {
+  if (!header_and_body.body().empty()) {
     return std::unique_ptr<string>(new string(
         header_and_body.body()));
   } else {
@@ -95,13 +95,13 @@ int SecureMessageWrapper::GetEncryptionScheme(const string& header_bytes) {
 bool SecureMessageWrapper::HasDecryptionKeyId(const string& header_bytes) {
   Header header;
   header.ParseFromString(header_bytes);
-  return header.has_decryption_key_id();
+  return !header.decryption_key_id().empty();
 }
 
 bool SecureMessageWrapper::HasVerificationKeyId(const string& header_bytes) {
   Header header;
   header.ParseFromString(header_bytes);
-  return header.has_verification_key_id();
+  return !header.verification_key_id().empty();
 }
 
 uint32_t SecureMessageWrapper::GetAssociatedDataLength(
