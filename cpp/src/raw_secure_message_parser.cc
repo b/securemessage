@@ -20,10 +20,10 @@
 //
 // @see RawSecureMessageBuilder
 
-#include "securemessage/raw_secure_message_parser.h"
+#include "raw_secure_message_parser.h"
 
-#include "securemessage/secure_message_wrapper.h"
-#include "securemessage/util.h"
+#include "secure_message_wrapper.h"
+#include "util.h"
 
 using std::unique_ptr;
 
@@ -152,7 +152,7 @@ bool RawSecureMessageParser::VerifyHeaderAndBody(
 
   if (header == nullptr) {
     Util::LogError("message must have header");
-    return nullptr;
+    return false;//nullptr;
   }
 
   // Does not return early in order to avoid timing attacks

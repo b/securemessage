@@ -20,10 +20,10 @@
 //
 // @see SecureMessageBuilder
 
-#include "securemessage/secure_message_parser.h"
+#include "secure_message_parser.h"
 
-#include "securemessage/raw_secure_message_parser.h"
-#include "securemessage/util.h"
+#include "raw_secure_message_parser.h"
+#include "util.h"
 
 namespace securemessage {
 

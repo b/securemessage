@@ -22,9 +22,9 @@
 
 #include <stddef.h>
 
-#include "securemessage/crypto_ops.h"
-#include "securemessage/secure_message_wrapper.h"
-#include "securemessage/util.h"
+#include "crypto_ops.h"
+#include "secure_message_wrapper.h"
+#include "util.h"
 
 using std::unique_ptr;
 
@@ -357,7 +357,7 @@ bool CryptoOps::Verify(SigType sigType,
     case HMAC_SHA256: {
       if (verificationKey.type() != SECRET) {
         Util::LogError("Invalid signing key type");
-        return nullptr;
+        return false;//nullptr;
       }
       // Compute expected signature
       unique_ptr<SecretKey> derived_key = DeriveAes256KeyFor(

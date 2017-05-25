@@ -31,9 +31,9 @@
 #include <memory>
 #include <string>
 
-#include "securemessage/byte_buffer.h"
-#include "securemessage/crypto_ops.h"
-#include "securemessage/util.h"
+#include "byte_buffer.h"
+#include "crypto_ops.h"
+#include "util.h"
 
 using std::unique_ptr;
 

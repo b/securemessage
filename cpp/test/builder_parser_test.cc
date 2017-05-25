@@ -19,11 +19,11 @@
 
 #include <gtest/gtest.h>
 
-#include "securemessage/byte_buffer.h"
-#include "securemessage/public_key_proto_util.h"
-#include "securemessage/secure_message_builder.h"
-#include "securemessage/secure_message_parser.h"
-#include "securemessage/secure_message_wrapper.h"
+#include "byte_buffer.h"
+#include "public_key_proto_util.h"
+#include "secure_message_builder.h"
+#include "secure_message_parser.h"
+#include "secure_message_wrapper.h"
 
 
 using std::unique_ptr;

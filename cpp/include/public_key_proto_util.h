@@ -18,8 +18,8 @@
 #define SECUREMESSAGE_PUBLIC_KEY_PROTO_UTIL_H_
 
 #include <memory>
-#include "securemessage/common.h"
-#include "securemessage/crypto_ops.h"
+#include "common.h"
+#include "crypto_ops.h"
 #include "securemessage.pb.h"
 
 namespace securemessage {

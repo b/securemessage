@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "securemessage/common.h"
+#include "common.h"
 
 namespace securemessage {
 

@@ -21,8 +21,8 @@
 
 #include "securemessage.pb.h"
 
-#include "securemessage/common.h"
-#include "securemessage/crypto_ops.h"
+#include "common.h"
+#include "crypto_ops.h"
 
 namespace securemessage {
 

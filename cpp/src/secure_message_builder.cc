@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "securemessage/secure_message_builder.h"
+#include "secure_message_builder.h"
 
-#include "securemessage/secure_message_wrapper.h"
-#include "securemessage/util.h"
+#include "secure_message_wrapper.h"
+#include "util.h"
 
 using std::unique_ptr;
 

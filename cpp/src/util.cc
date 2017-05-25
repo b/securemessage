@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include "securemessage/util.h"
+#include "util.h"
 
 using std::unique_ptr;
 
